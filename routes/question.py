@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from db.get_db import get_db
 from models.question_model import Question
+from routes.answer import GetAnswer
 
 q_router = APIRouter() #question as q
 
@@ -21,12 +22,14 @@ class GetQuestion(BaseModel):
     class Config:
         orm_mode = True
 
+class GetQuestionWithAnswers(GetQuestion):
+    answers: List[GetAnswer] = []
+
 @q_router.post("/questions", response_model=GetQuestion)
 async def create_question(data: CreateQuestion, db: Session = Depends(get_db)):
     """Создание вопроса"""
     try:
-        new_question = Question(text = data.text,
-                                created_at = data.datetime)
+        new_question = Question(text = data.text)
         db.add(new_question)
         db.commit()
         db.refresh(new_question)
@@ -40,6 +43,18 @@ async def get_all_questions(db: Session = Depends(get_db)):
     try:
         all_questions = db.query(Question).order_by(Question.created_at).all()
         return all_questions
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка на сервере")
+
+@q_router.get("/questions/{id}", response_model=GetQuestionWithAnswers)
+async def get_answers_to_the_question(id: int, db: Session = Depends(get_db)):
+    """Функция получения всех ответов на конкретный вопрос"""
+    try:
+        question = db.query(Question).filter(Question.id == id).first()
+        if not question:
+            raise HTTPException(status_code=404, detail="Такой вопрос не найден!")
+        return question
     except Exception as e:
         print(f"Ошибка: {e}")
         raise HTTPException(status_code=500, detail="Ошибка на сервере")
