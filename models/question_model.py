@@ -10,6 +10,6 @@ class Question(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")

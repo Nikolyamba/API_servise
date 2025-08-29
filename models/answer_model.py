@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship
 
 from db.session import Base
 
-
 class Answer(Base):
     __tablename__ = "answers"
     id = Column(Integer, primary_key=True, autoincrement=True)
