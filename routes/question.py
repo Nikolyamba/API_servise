@@ -41,7 +41,7 @@ async def create_question(data: CreateQuestion, db: Session = Depends(get_db)):
 async def get_all_questions(db: Session = Depends(get_db)):
     """Функция получения всех вопросов"""
     try:
-        all_questions = db.query(Question).order_by(Question.created_at).all()
+        all_questions = db.query(Question).order_by(Question.created_at.desc()).all()
         return all_questions
     except Exception as e:
         print(f"Ошибка: {e}")

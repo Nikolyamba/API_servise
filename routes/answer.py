@@ -26,15 +26,13 @@ class GetAnswer(BaseModel):
     class Config:
         orm_mode = True
 
-
-
 @a_router.post("/questions/{id}/answers", response_model = GetAnswer)
 async def create_answer(data: CreateAnswer, id: int, db: Session = Depends(get_db)):
     try:
         question = db.query(Question).filter(Question.id == id).first()
         if not question:
             raise HTTPException(status_code=404, detail="Такого вопроса нет!")
-        new_answer = Answer(question_id = data.question_id,
+        new_answer = Answer(question_id = id,
                             user_id = data.user_id,
                             text = data.text)
         db.add(new_answer)
